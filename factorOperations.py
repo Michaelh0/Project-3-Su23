@@ -101,9 +101,90 @@ def joinFactors(factors: List[Factor]):
                     "\n".join(map(str, factors)))
 
 
-    "*** YOUR CODE HERE ***"
-    raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    listedFactors = list(factors)
+    newFactor = 0
+    newConditional = set()
+    newUnconditional = set()
+    for condition in listedFactors:
+        newConditional = newConditional.union(set(condition.conditionedVariables()))
+
+    for uncondition in listedFactors:
+        newUnconditional = newUnconditional.union(set(uncondition.unconditionedVariables()))
+
+    
+    
+    #intersect = newUnconditional.intersection(newConditional)
+    difference_condition = newConditional.difference(newUnconditional)
+    #rest = newUnconditional.difference(newConditional)
+    newConditional = list(newConditional)
+    newUnconditional = list(newUnconditional)
+    
+    #new factor.conditioned = factors[0].unconditioned + factors[1].unconditioned
+    
+
+    firstDict = listedFactors[0].variableDomainsDict()
+    for diction in listedFactors[1:]:
+        secondDict = diction.variableDomainsDict()
+        firstDict.update(secondDict)
+    print()
+    #getting all factors for creating new factor
+    #newUnconditional =  list(rest)
+    newConditional =  list(difference_condition) #+ list(difference_condition2)
+    print(newConditional,newUnconditional)
+    newFactor = Factor(newUnconditional, newConditional,firstDict)
+    
+    x = newFactor.getAllPossibleAssignmentDicts()
+    for i in x:
+        productProb = 1
+        for prob in listedFactors:
+            productProb = productProb * prob.getProbability(i)
+        newFactor.setProbability(i,productProb)
+
+    #previous version of code 
+    
+    # listedFactors = list(factors)
+    # newFactor = 0
+    # firstFactor_conditioned = listedFactors[0].conditionedVariables()
+    # firstFactor_unconditioned = listedFactors[0].unconditionedVariables()
+    # secondFactor_conditioned = listedFactors[1].conditionedVariables()
+    # secondFactor_unconditioned = listedFactors[1].unconditionedVariables()
+    # intersect = firstFactor_conditioned.intersection(secondFactor_unconditioned)
+    # difference_condition = firstFactor_conditioned.difference(secondFactor_unconditioned)
+    # difference_condition2 = secondFactor_conditioned.difference(firstFactor_unconditioned)
+
+    # #new factor.conditioned = factors[0].unconditioned + factors[1].unconditioned
+    
+    # firstDict = listedFactors[0].variableDomainsDict()
+    # secondDict = listedFactors[0].variableDomainsDict()
+    
+    # #getting all factors for creating new factor
+    # newUnconditional = list(listedFactors[0].unconditionedVariables()) + list(intersect)
+    # newConditional =  list(difference_condition) + list(difference_condition2)
+    # firstDict.update(secondDict)
+    # newFactor = Factor(newUnconditional, newConditional,firstDict)
+    
+    # x = newFactor.getAllPossibleAssignmentDicts()
+    # for i in x:
+    #     newFactor.setProbability(i,listedFactors[0].getProbability(i)*listedFactors[1].getProbability(i))
+
+    # # elif factors[0].conditioned == factors[1].conditioned:
+    # #     must still be conditioned
+    # # elif they are all different:
+    # #     squish the unconditioned together and conditioned together
+
+    # print(len(factors))
+    # print(len(listedFactors))
+    # print(listedFactors[2:])
+
+    # elif factors[0].conditioned == factors[1].conditioned:
+    #     must still be conditioned
+    # elif they are all different:
+    #     squish the unconditioned together and conditioned together
+
+    
+    return newFactor
+
+    
 
 ########### ########### ###########
 ########### QUESTION 3  ###########
