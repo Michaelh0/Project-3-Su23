@@ -217,71 +217,35 @@ def inferenceByVariableEliminationWithCallTracking(callTrackingList=None):
         # initialize return variables and the variables to eliminate
         evidenceVariablesSet = set(evidenceDict.keys())
         queryVariablesSet = set(queryVariables)
-        #notElimination = list(evidenceVariablesSet) + list(queryVariablesSet)
-        # print(evidenceVariablesSet)
-        # print(queryVariablesSet)
-        # print(eliminationOrder)
 
         # grab all factors where we know the evidence variables (to reduce the size of the tables)
         currentFactorsList = bayesNet.getAllCPTsWithEvidence(evidenceDict)
-
-        # print(currentFactorsList)
-
-        # for joinVariable in notElimination:
-        #     currentFactorsList, joinedFactor = joinFactorsByVariable(currentFactorsList, joinVariable)
-        #     currentFactorsList.append(joinedFactor)
-
-        print(eliminationOrder)
-        #print(bayesNet.variablesSet())
-
+        #print(currentFactorsList)
         incrementallyMarginalizedJoint = 0
 
         for partial in eliminationOrder:    
             currentFactorsList, joinedFactor = joinFactorsByVariable(currentFactorsList, partial)
             currentFactorsList.append(joinedFactor)
+    
+            removed = False
+            #print(currentFactorsList)
             
-            removed = False;
             for factor in currentFactorsList:
                 if (list(factor.unconditionedVariables())) == [partial]:
                     currentFactorsList.remove(factor) 
                     removed = True
-
-            fullJoint = joinFactors(currentFactorsList)
-            incrementallyMarginalizedJoint = fullJoint
-
+            #fullJoint = joinFactors(currentFactorsList)
             if not removed:
-                incrementallyMarginalizedJoint = eliminate(incrementallyMarginalizedJoint, partial)
-                currentFactorsList.append(incrementallyMarginalizedJoint)
-
-
-            #print("bye",incrementallyMarginalizedJoint)
-
-
-
-        # # join all factors by variable
-        
-        # for joinVariable in bayesNet.variablesSet():
-        #     currentFactorsList, joinedFactor = joinFactorsByVariable(currentFactorsList, joinVariable)
-        #     currentFactorsList.append(joinedFactor)
-
-        # # currentFactorsList should contain the connected components of the graph now as factors, must join the connected components
-        # fullJoint = joinFactors(currentFactorsList)
-
-        # # marginalize all variables that aren't query or evidence
-        # incrementallyMarginalizedJoint = fullJoint
-        # for eliminationVariable in eliminationVariables:
-        #     incrementallyMarginalizedJoint = eliminate(incrementallyMarginalizedJoint, eliminationVariable)
-
-        fullJointOverQueryAndEvidence = incrementallyMarginalizedJoint
-
-        # normalize so that the probability sums to one
-        # the input factor contains only the query variables and the evidence variables, 
-        # both as unconditioned variables
+                for factor in currentFactorsList:
+                    if (partial in list(factor.unconditionedVariables())):
+                        incrementallyMarginalizedJoint = eliminate(joinedFactor, partial)
+                        currentFactorsList.remove(joinedFactor)
+                        currentFactorsList.append(incrementallyMarginalizedJoint)
+        #print(currentFactorsList)
+        fullJoint = joinFactors(currentFactorsList)
+        fullJointOverQueryAndEvidence = fullJoint
         queryConditionedOnEvidence = normalize(fullJointOverQueryAndEvidence)
-        #print(queryConditionedOnEvidence)
-        # now the factor is conditioned on the evidence variables
 
-        # the order is join on all variables, then eliminate on all elimination variables
         return queryConditionedOnEvidence
 
 
