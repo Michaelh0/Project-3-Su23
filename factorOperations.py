@@ -100,6 +100,8 @@ def joinFactors(factors: List[Factor]):
                     "Input factors: \n" +
                     "\n".join(map(str, factors)))
 
+    
+
 
     listedFactors = list(factors)
     newFactor = 0
@@ -126,11 +128,11 @@ def joinFactors(factors: List[Factor]):
     for diction in listedFactors[1:]:
         secondDict = diction.variableDomainsDict()
         firstDict.update(secondDict)
-    print()
+    
     #getting all factors for creating new factor
     #newUnconditional =  list(rest)
     newConditional =  list(difference_condition) #+ list(difference_condition2)
-    print(newConditional,newUnconditional)
+    #print(newConditional,newUnconditional)
     newFactor = Factor(newUnconditional, newConditional,firstDict)
     
     x = newFactor.getAllPossibleAssignmentDicts()
@@ -197,11 +199,11 @@ def eliminateWithCallTracking(callTrackingList=None):
         newFactor = Factor(list(uncondition),list(condition),factor.variableDomainsDict())
         
         for i in allPossible:
-            print(factor.getProbability(i))
-            print(newFactor.getProbability(i))
+            #print(factor.getProbability(i))
+            #print(newFactor.getProbability(i))
             newFactor.setProbability(i, factor.getProbability(i)+ newFactor.getProbability(i))
 
-        print(newFactor)
+        #print(newFactor)
         return newFactor
 
     return eliminate
